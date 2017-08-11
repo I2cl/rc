@@ -1,6 +1,30 @@
+"#移動系"
+
+"shift + hjklで拡大移動
+nnoremap J 10j
+nnoremap K 10k
+nnoremap L 10l
+nnoremap H 10h
+
+vnoremap J 10j
+vnoremap K 10k
+vnoremap L 10l
+vnoremap H 10h
+
+"insertnnomde 以外十字キー移動禁止
+nnoremap <Up> <Nop>
+nnoremap <Down> <Nop>
+nnoremap <Left> <Nop>
+nnoremap <Right> <Nop>
+
+vnoremap <Up> <Nop>
+vnoremap <Down> <Nop>
+vnoremap <Left> <Nop>
+vnoremap <Right> <Nop>
+
+
 syntax on
 
-set autoindent
 
 "文字コードをUFT-8に設定
 set fenc=utf-8
@@ -14,7 +38,8 @@ set autoread
 set hidden
 " 入力中のコマンドをステータスに表示する
 set showcmd
-
+"貼り付け崩さない
+set pastetoggle=<F9>
 
 
 " 見た目系
@@ -66,7 +91,6 @@ nmap <Esc><Esc> :nohlsearch<CR><Esc>
 set wildmenu " コマンドモードの補完
 set history=500 " 保存するコマンド履歴の数
 
-filetype plugin indent on
 
 
 
@@ -87,7 +111,6 @@ NeoBundle 'mattn/emmet-vim'
 " Ruby向けにendを自動挿入してくれる
  NeoBundle 'tpope/vim-endwise'
  NeoBundle 'tpope/vim-surround'
-
 call neobundle#end()
 
   " Required:
