@@ -40,6 +40,12 @@ set hidden
 set showcmd
 "貼り付け崩さない
 set pastetoggle=<F9>
+"クリボーの共有for OSX
+set clipboard=unnamed
+"vim8系backspaceでdelete死んだので追加
+set backspace=indent,eol,start
+
+
 
 
 " 見た目系
@@ -90,7 +96,8 @@ set hlsearch
 nmap <Esc><Esc> :nohlsearch<CR><Esc>
 set wildmenu " コマンドモードの補完
 set history=500 " 保存するコマンド履歴の数
-
+"NerdTree config
+map <C-n> :NERDTreeToggle<CR>
 
 
 
@@ -111,6 +118,8 @@ NeoBundle 'mattn/emmet-vim'
 " Ruby向けにendを自動挿入してくれる
  NeoBundle 'tpope/vim-endwise'
  NeoBundle 'tpope/vim-surround'
+ NeoBundle 'scrooloose/nerdtree'
+
 call neobundle#end()
 
   " Required:

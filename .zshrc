@@ -1,3 +1,5 @@
+echo "hello"
+
 export ZSH=/Users/zan9/.oh-my-zsh
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 ZSH_THEME="af-magic"
@@ -11,24 +13,24 @@ fpath=(/usr/local/share/zsh-completions $fpath)
 eval "$(rbenv init -)"
 
 #pecoのせってい
-function peco-z-search
-{
- which peco z > /dev/null
- if [ $? -ne 0 ]; then
-   echo "Please install peco and z"
-   return 1
- fi
- local res=$(z | sort -rn | cut -c 12- | peco)
- if [ -n "$res" ]; then
-   BUFFER+="cd $res"
-   zle accept-line
- else
-   return 1
- fi
+
+function peco-select-history() {
+    local tac
+    if which tac > /dev/null; then
+        tac="tac"
+    else
+        tac="tail -r"
+    fi
+    BUFFER=$(\history -n 1 | \
+        eval $tac | \
+        peco --query "$LBUFFER")
+    CURSOR=$#BUFFER
+    zle clear-screen
 }
-zle -N peco-z-search
-bindkey '^f' peco-z-search
-# end peco
+zle -N peco-select-history
+bindkey '^r' peco-select-history
+
+
 
 alias v='vim'
 
