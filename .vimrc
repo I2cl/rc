@@ -11,27 +11,11 @@ vnoremap K 10k
 vnoremap L 10l
 vnoremap H 10h
 
-"insertnnomde 以外十字キー移動禁止
-nnoremap <Up> <Nop>
-nnoremap <Down> <Nop>
-nnoremap <Left> <Nop>
-nnoremap <Right> <Nop>
-
-vnoremap <Up> <Nop>
-vnoremap <Down> <Nop>
-vnoremap <Left> <Nop>
-vnoremap <Right> <Nop>
-
-
 syntax on
 
 
 "文字コードをUFT-8に設定
 set fenc=utf-8
-" バックアップファイルを作らない
-set nobackup
-" スワップファイルを作らない
-set noswapfile
 " 編集中のファイルが変更されたら自動で読み直す
 set autoread
 " バッファが編集中でもその他のファイルを開けるように
@@ -45,7 +29,11 @@ set clipboard=unnamed
 "vim8系backspaceでdelete死んだので追加
 set backspace=indent,eol,start
 
-
+"backupfile & swap 作成場所指定
+set backup
+set backupdir=~/var/vim/backup
+set swapfile
+set directory=~/var/vim/swap
 
 
 " 見た目系
@@ -57,8 +45,6 @@ set cursorline
 set virtualedit=onemore
 " インデントはスマートインデント
 set smartindent
-" ビープ音を可視化
-set visualbell
 " 括弧入力時の対応する括弧を表示
 set showmatch
 " ステータスラインを常に表示
@@ -68,6 +54,9 @@ set wildmode=list:longest
 " 折り返し時に表示行単位での移動できるようにする
 nnoremap j gj
 nnoremap k gk
+set t_Co=256
+
+
 
 " Tab系
 " 不可視文字を可視化(タブが「▸-」と表示される)
@@ -80,6 +69,51 @@ set tabstop=2
 set shiftwidth=2
 set nocompatible
 filetype off
+
+" Anywhere SID.
+function! s:SID_PREFIX()
+  return matchstr(expand('<sfile>'), '<SNR>\d\+_\zeSID_PREFIX$')
+endfunction
+
+" Set tabline.
+function! s:my_tabline()  "{{{
+  let s = ''
+  for i in range(1, tabpagenr('$'))
+    let bufnrs = tabpagebuflist(i)
+    let bufnr = bufnrs[tabpagewinnr(i) - 1]  " first window, first appears
+    let no = i  " display 0-origin tabpagenr.
+    let mod = getbufvar(bufnr, '&modified') ? '!' : ' '
+    let title = fnamemodify(bufname(bufnr), ':t')
+    let title = '[' . title . ']'
+    let s .= '%'.i.'T'
+    let s .= '%#' . (i == tabpagenr() ? 'TabLineSel' : 'TabLine') . '#'
+    let s .= no . ':' . title
+    let s .= mod
+    let s .= '%#TabLineFill# '
+  endfor
+  let s .= '%#TabLineFill#%T%=%#TabLine#'
+  return s
+endfunction "}}}
+let &tabline = '%!'. s:SID_PREFIX() . 'my_tabline()'
+set showtabline=2 " 常にタブラインを表示
+
+" The prefix key.
+nnoremap    [Tag]   <Nop>
+nmap    t [Tag]
+" Tab jump
+for n in range(1, 9)
+  execute 'nnoremap <silent> [Tag]'.n  ':<C-u>tabnext'.n.'<CR>'
+endfor
+" t1 で1番左のタブ、t2 で1番左から2番目のタブにジャンプ
+
+map <silent> [Tag]c :tablast <bar> tabnew<CR>
+" tc 新しいタブを一番右に作る
+map <silent> [Tag]x :tabclose<CR>
+" tx タブを閉じる
+map <silent> [Tag]n :tabnext<CR>
+" tn 次のタブ
+map <silent> [Tag]p :tabprevious<CR>
+" tp 前のタブ
 
 " 検索系
 " 検索文字列が小文字の場合は大文字小文字を区別なく検索する
@@ -111,14 +145,59 @@ call neobundle#begin(expand('~/.vim/bundle/'))
   " Required:
 NeoBundleFetch 'Shougo/neobundle.vim'
 
-  " My Bundles here:########################################################
-NeoBundle 'mattn/emmet-vim'
+  "######################################## My Bundles here:########################################################
+"html補完
+ NeoBundle 'mattn/emmet-vim'
+ " neocomplcache
+NeoBundle 'Shougo/neocomplcache'
+NeoBundle 'scrooloose/nerdtree'
+NeoBundle 'jistr/vim-nerdtree-tabs'
+" Disable AutoComplPop.
+let g:acp_enableAtStartup = 0
+" Use neocomplcache.
+let g:neocomplcache_enable_at_startup = 1
+" Use smartcase.
+let g:neocomplcache_enable_smart_case = 1
+" Set minimum syntax keyword length.
+let g:neocomplcache_min_syntax_length = 3
+let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
+
+" Define dictionary.
+let g:neocomplcache_dictionary_filetype_lists = {
+    \ 'default' : ''
+    \ }
+
+" Plugin key-mappings.
+inoremap <expr><C-g>     neocomplcache#undo_completion()
+inoremap <expr><C-l>     neocomplcache#complete_common_string()
+
+" Recommended key-mappings.
+" <CR>: close popup and save indent.
+inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+function! s:my_cr_function()
+  return neocomplcache#smart_close_popup() . "\<CR>"
+endfunction
+" <TAB>: completion.
+inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+" <C-h>, <BS>: close popup and delete backword char.
+inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
+inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
+inoremap <expr><C-y>  neocomplcache#close_popup()
+inoremap <expr><C-e>  neocomplcache#cancel_popup()
+map <C-n> <plug>NERDTreeTabsToggle<CR>
+
+
+ 
 " Rails向けのコマンドを提供する
  NeoBundle 'tpope/vim-rails'
+"vim theme
+ NeoBundle 'jacoborus/tender.vim'
+ NeoBundle 'dracula/vim'
+"下のインサートやらなんやら良くする
+ NeoBundle 'itchyny/lightline.vim' 
 " Ruby向けにendを自動挿入してくれる
  NeoBundle 'tpope/vim-endwise'
- NeoBundle 'tpope/vim-surround'
- NeoBundle 'scrooloose/nerdtree'
+
 
 call neobundle#end()
 
@@ -128,5 +207,6 @@ filetype plugin indent on
   " If there are uninstalled bundles found on startup,
   " this will conveniently prompt you to install them.
 NeoBundleCheck
-
+ syntax enable
+ colorscheme dracula
 
