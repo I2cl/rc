@@ -1,5 +1,3 @@
-"こんばんわあ
-
 "shift + hjklで拡大移動
 nnoremap K 10k
 nnoremap L 10l
@@ -10,13 +8,18 @@ vnoremap K 10k
 vnoremap L 10l
 vnoremap H 10h
 
-
-" 入力モード中に素早くJJと入力した場合はESCとみなす
+" iモードjjと入力した場合はESC
 inoremap jj <Esc>
 "分裂ss & sv
 nnoremap ss :<C-u>sp<CR>
 nnoremap sv :<C-u>vs<CR>
-
+"検索語が画面の真ん中に
+nmap n nzz
+nmap N Nzz
+nmap * *zz
+nmap # #zz
+nmap g* g*zz
+nmap g# g#zz
 
 syntax on
 
@@ -37,17 +40,19 @@ set clipboard=unnamed
 set backspace=indent,eol,start
 
 "backupfile & swap 作成場所指定
-set backup
-set backupdir=~/var/vim/backup
-set swapfile
-set directory=~/var/vim/swap
+set nobackup
+"set backupdir=~/var/vim/backup
+set noswapfile
+"set directory=~/var/vim/swap
+"過去ファイル拝見
 
+nnoremap <silent> -- :<C-u>Unite file_mru<CR>
 
 " 見た目系
 " 行番号を表示
 set number
 " 現在の行を強調表示
-set cursorline
+"set cursorline
 " 行末の1文字先までカーソルを移動できるように
 set virtualedit=onemore
 " インデントはスマートインデント
@@ -63,6 +68,12 @@ nnoremap j gj
 nnoremap k gk
 set t_Co=256
 
+"行末のかすな空白を表示する
+augroup HighlightTrailingSpaces
+  autocmd!
+  autocmd VimEnter,WinEnter,ColorScheme * highlight TrailingSpaces term=underline guibg=Red ctermbg=Red
+  autocmd VimEnter,WinEnter * match TrailingSpaces /\s\+$/
+augroup END
 
 
 " Tab系
@@ -122,6 +133,9 @@ map <silent> [Tag]n :tabnext<CR>
 map <silent> [Tag]p :tabprevious<CR>
 " tp 前のタブ
 
+
+
+
 " 検索系
 " 検索文字列が小文字の場合は大文字小文字を区別なく検索する
 set ignorecase
@@ -140,6 +154,9 @@ set history=500 " 保存するコマンド履歴の数
 "NerdTree config
 map <C-n> :NERDTreeToggle<CR>
 
+
+
+
 " 全角スペースの表示
 """"""""""""""""""""""""""""""
 function! ZenkakuSpace()
@@ -155,6 +172,7 @@ if has('syntax')
     call ZenkakuSpace()
 endif
 
+autocmd BufNewFile,BufRead *.{vue*} set filetype=html
 
   " Required:
 set runtimepath+=~/.vim/bundle/neobundle.vim/
@@ -165,15 +183,31 @@ call neobundle#begin(expand('~/.vim/bundle/'))
   " Let NeoBundle manage NeoBundle
   " Required:
 NeoBundleFetch 'Shougo/neobundle.vim'
-
-  "######################################## My Bundles here:########################################################
 "html補完
- NeoBundle 'mattn/emmet-vim'
+NeoBundle 'mattn/emmet-vim'
+" slim
+NeoBundle "slim-template/vim-slim"
  " neocomplcache
 NeoBundle 'Shougo/neocomplcache'
 NeoBundle 'Shougo/unite.vim'
+NeoBundle 'Shougo/neomru.vim'
 NeoBundle 'scrooloose/nerdtree'
 NeoBundle 'jistr/vim-nerdtree-tabs'
+"vim theme
+NeoBundle 'jacoborus/tender.vim'
+NeoBundle 'dracula/vim'
+"下のインサートやらなんやら良くする
+NeoBundle 'itchyny/lightline.vim'
+" Ruby向けにendを自動挿入してくれる
+NeoBundle 'tpope/vim-endwise'
+"control + Eでウィンドウリサイズモード
+NeoBundle 'simeji/winresizer'
+ "保管
+NeoBundle 'marcus/rsense'
+
+NeoBundle 'leafgarland/typescript-vim'
+NeoBundle 'scrooloose/syntastic'
+NeoBundle "ctrlpvim/ctrlp.vim"
 " Disable AutoComplPop.
 let g:acp_enableAtStartup = 0
 " Use neocomplcache.
@@ -185,9 +219,9 @@ let g:neocomplcache_min_syntax_length = 3
 let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
 
 " Define dictionary.
-let g:neocomplcache_dictionary_filetype_lists = {
-    \ 'default' : ''
-    \ }
+let g:neocomplete#sources#dictionary#dictionaries = {
+\   'ruby': $HOME . '/dicts/ruby.dict',
+\ }
 
 " Plugin key-mappings.
 inoremap <expr><C-g>     neocomplcache#undo_completion()
@@ -208,31 +242,12 @@ inoremap <expr><C-y>  neocomplcache#close_popup()
 inoremap <expr><C-e>  neocomplcache#cancel_popup()
 map <C-n> <plug>NERDTreeTabsToggle<CR>
 
-
- 
-" Rails向けのコマンドを提供する
- NeoBundle 'tpope/vim-rails'
-"vim theme
- NeoBundle 'jacoborus/tender.vim'
- NeoBundle 'dracula/vim'
-"下のインサートやらなんやら良くする
- NeoBundle 'itchyny/lightline.vim' 
-" Ruby向けにendを自動挿入してくれる
- NeoBundle 'tpope/vim-endwise'
-"control + Eでウィンドウリサイズモード
- NeoBundle 'simeji/winresizer'
-"保管
- NeoBundle 'marcus/rsense'
- NeoBundle 'scrooloose/syntastic'
  let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': ['ruby'] }
- 
+
 call neobundle#end()
 
-  " Required:
+" Required:
 filetype plugin indent on
-
-  " If there are uninstalled bundles found on startup,
-  " this will conveniently prompt you to install them.
 NeoBundleCheck
 
 
