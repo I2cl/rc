@@ -1,17 +1,17 @@
+export PATH=$HOME/.rbenv/bin:$PATH
 eval "$(rbenv init -)"
 
 export ZSH=/Users/zan9/.oh-my-zsh
 source $ZSH/oh-my-zsh.sh
 export PATH=/usr/local/bin:$PATH
 fpath=(/usr/local/share/zsh-completions $fpath)
-
-
-
-ZSH_THEME="nebirhos"
+#ZSH_THEME="dracula"
+ZSH_THEME="af-magic"
 # User configuration
 source $ZSH/oh-my-zsh.sh
- 
- 
+
+# zhs-completions
+fpath=(/usr/local/share/zsh-completions $fpath)
 # 文字コードの指定
 export LANG=ja_JP.UTF-8
 # 日本語ファイル名を表示可能にする
@@ -49,6 +49,9 @@ export PATH="$HOME/.rbenv/bin:$PATH"
 
 
 
+#fasdの起動、これはプラグインではなくbrewでinstall
+
+eval "$(fasd --init auto)"
 
 #peco
 function peco-select-history() {
@@ -67,17 +70,31 @@ function peco-select-history() {
 zle -N peco-select-history
 bindkey '^r' peco-select-history
 
-alias be='bundle exec'
-alias gss='git status -s'
-alias gd='git diff'
-alias gd='git diff'
-alias gg="git log --graph --date-order -C -M --pretty=format:'%h [%ar] [%an] %Cgreen%d%Creset %s' --all"
-alias g=git
-alias gstp="git stash pop"
-alias gsts="git stash save"
-alias grhh="git reset --hard HEAD"
+alias v="vim"
+alias x="tmux"
+alias g="git"
 
+alias be='bundle exec'
+alias r="rails"
+alias rs='rails server'
+alias rc='rails console'
+alias rg='rails generate'
+alias berm="bundle exec rake db:migrate"
+alias rspec="rspec -fd"
+alias b='bundle'
 
 alias ct="`brew --prefix`/bin/ctags"
 alias ls="exa"
 alias la="exa -la"
+alias his="history"
+alias ag='ag --pager="less -R"'
+
+alias a='fasd -a'        # any
+alias s='fasd -si'       # show / search / select
+alias d='fasd -d'        # directory
+alias f='fasd -f'        # file
+alias sd='fasd -sid'     # interactive directory selection
+alias sf='fasd -sif'     # interactive file selection
+alias z='fasd_cd -d'     # cd, same functionality as j in autojump
+alias zz='fasd_cd -d -i' # cd with interactive selection
+
